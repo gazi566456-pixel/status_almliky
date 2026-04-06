@@ -65,11 +65,10 @@ class _DashboardViewState extends State<DashboardView> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 🔥 إصلاح هندسي: وضع البانر فوق شريط التنقل لضمان عدم اختفائه خلف أزرار النظام
-          const AdBannerWidget(),
           DashboardBottomNav(
             destinations: _pageViews.keys.toList(),
           ),
+          const AdBannerWidget(),
         ],
       ),
       appBar: AppBar(
@@ -99,8 +98,8 @@ class _DashboardViewState extends State<DashboardView> {
             physics: const AlwaysScrollableScrollPhysics(),
             itemBuilder: (_, int i) => _pageViews.values.elementAt(i),
             onPageChanged: (int index) {
-              // 🔥 إصلاح هندسي: تم حذف استدعاء الإعلان البيني من هنا 
-              // لأن عرضه عند التنقل بين التبويبات مخالف لسياسات AdMob (Unexpected Interstitial)
+              // 🔥 عرض إعلان بيني عند التنقل بين الصفحات
+              AdsService().showInterstitialAd();
               return cubit.updateBottomNavIndex(index, movePage: false);
             },
           ),

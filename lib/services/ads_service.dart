@@ -39,14 +39,12 @@ class AdsService {
 
   /// Initialize the SDK
   Future<void> init() async {
-    try {
-      await MobileAds.instance.initialize();
-      debugPrint('AdsService: AdMob Initialized');
-      loadInterstitialAd();
-    } catch (e) {
-      debugPrint('AdsService: Initialization Error: $e');
-    }
-  }
+  // تهيئة Google Mobile Ads
+  await MobileAds.instance.initialize();
+
+  // 🔥 تحميل الإعلان البيني لأول مرة
+  loadInterstitialAd();
+}
 
   /// Load Interstitial Ad with Retry Logic
   void loadInterstitialAd() {
