@@ -16,24 +16,12 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   void initState() {
     super.initState();
 
-_bannerAd = BannerAd(
-  size: AdSize.banner,
-  adUnitId: "ca-app-pub-3940256099942544/6300978111",
-  listener: BannerAdListener(
-    onAdLoaded: (ad) {
-      debugPrint("✅ Ad Loaded");
-    },
-    onAdFailedToLoad: (ad, error) {
-      debugPrint("❌ Ad Failed: $error");
-      ad.dispose();
-    },
-  ),
-  request: const AdRequest(),
-)..load();
-    // 🔥 إعلان تجريبي
+    _bannerAd = BannerAd(
+      size: AdSize.banner,
+      adUnitId: "ca-app-pub-3940256099942544/6300978111",
       listener: BannerAdListener(
         onAdLoaded: (ad) {
-          debugPrint("✅ Banner Ad Loaded");
+          debugPrint("✅ Ad Loaded");
         },
         onAdFailedToLoad: (ad, error) {
           debugPrint("❌ Ad Failed: $error");
@@ -41,7 +29,9 @@ _bannerAd = BannerAd(
         },
       ),
       request: const AdRequest(),
-    )..load();
+    );
+
+    _bannerAd!.load();
   }
 
   @override
@@ -92,6 +82,7 @@ class StatusViewerLayoutWidget extends StatelessWidget {
       itemCount: files.length + (files.length ~/ 4) + 1,
 
       itemBuilder: (context, index) {
+
         // 🔥 أول عنصر إعلان
         if (index == 0) {
           return const BannerAdWidget();
@@ -111,7 +102,7 @@ class StatusViewerLayoutWidget extends StatelessWidget {
 
         final item = files[realIndex];
 
-        // 🔥 هنا Widget الحالة (عدّلها حسب مشروعك)
+        // 🔥 هنا Widget الحالة
         return WhatsAppItemCard(item: item);
       },
     );
@@ -131,7 +122,7 @@ class WhatsAppItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         color: Colors.grey[300],
       ),
-      child: Center(
+      child: const Center(
         child: Text(
           "Status",
           style: TextStyle(color: Colors.black),
