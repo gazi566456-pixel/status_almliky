@@ -12,23 +12,33 @@ class InitialView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final RouterNavigator navigator = RouterNavigator();
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        bloc: getItInstance.get<ThemeCubit>(),
-        builder: (BuildContext context, ThemeMode state) {
-          return MaterialApp.router(
-            themeMode: state,
-            title: AppSettings.appName,
-            theme: AppThemes().lightMode(),
-            darkTheme: AppThemes().darkMode(),
-            debugShowCheckedModeBanner: false,
-            routerDelegate: navigator.router.routerDelegate,
-            routeInformationParser: navigator.router.routeInformationParser,
-            routeInformationProvider: navigator.router.routeInformationProvider,
-          );
-        },
+
+      // 🔥 أهم تعديل هنا
+      child: BlocProvider(
+        create: (_) => getItInstance.isRegistered<ThemeCubit>()
+            ? getItInstance.get<ThemeCubit>()
+            : ThemeCubit(), // 👈 fallback إذا GetIt فشل
+
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (BuildContext context, ThemeMode state) {
+            return MaterialApp.router(
+              themeMode: state,
+              title: AppSettings.appName,
+              theme: AppThemes().lightMode(),
+              darkTheme: AppThemes().darkMode(),
+              debugShowCheckedModeBanner: false,
+              routerDelegate: navigator.router.routerDelegate,
+              routeInformationParser:
+                  navigator.router.routeInformationParser,
+              routeInformationProvider:
+                  navigator.router.routeInformationProvider,
+            );
+          },
+        ),
       ),
     );
   }
