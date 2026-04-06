@@ -16,9 +16,21 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   void initState() {
     super.initState();
 
-    _bannerAd = BannerAd(
-      size: AdSize.banner,
-      adUnitId: BannerAd.testAdUnitId, // 🔥 إعلان تجريبي
+_bannerAd = BannerAd(
+  size: AdSize.banner,
+  adUnitId: "ca-app-pub-3940256099942544/6300978111",
+  listener: BannerAdListener(
+    onAdLoaded: (ad) {
+      debugPrint("✅ Ad Loaded");
+    },
+    onAdFailedToLoad: (ad, error) {
+      debugPrint("❌ Ad Failed: $error");
+      ad.dispose();
+    },
+  ),
+  request: const AdRequest(),
+)..load();
+    // 🔥 إعلان تجريبي
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           debugPrint("✅ Banner Ad Loaded");
