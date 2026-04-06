@@ -1,14 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:statusgetter/core/model/status_item/status_item_model.dart';
-import 'package:statusgetter/views/dashboard/layouts/widgets/item_card/item_card_widget.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+// 🔥 Widget الإعلان
+class BannerAdWidget extends StatefulWidget {
+  const BannerAdWidget({super.key});
+
+  @override
+  State<BannerAdWidget> createState() => _BannerAdWidgetState();
+}
+
+class _BannerAdWidgetState extends State<BannerAdWidget> {
+  BannerAd? _bannerAd;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _bannerAd = BannerAd(
+      size: AdSize.banner,
+      adUnitId: BannerAd.testAdUnitId, // 🔥 إعلان تجريبي
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          debugPrint("✅ Banner Ad Loaded");
+        },
+        onAdFailedToLoad: (ad, error) {
+          debugPrint("❌ Ad Failed: $error");
+          ad.dispose();
+        },
+      ),
+      request: const AdRequest(),
+    )..load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_bannerAd == null) return const SizedBox();
+
+    return Container(
+      alignment: Alignment.center,
+      height: 50,
+      child: AdWidget(ad: _bannerAd!),
+    );
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+}
+
+// 🔥 Widget عرض الحالات
 class StatusViewerLayoutWidget extends StatelessWidget {
-  /// A [PageStorageKey] is used to uniquely identify a widget in the widget tree
-  /// and preserve its scroll position when the widget is destroyed and recreated.
-  /// It allows the widget to persist its state in [PageStorage] across page reloads,
-  /// enabling the restoration of scroll position and other stateful information.
+  final List files;
   final String pageStorageKey;
-  final List<StatusItemModel> files;
+
   const StatusViewerLayoutWidget({
     super.key,
     required this.files,
@@ -17,20 +63,68 @@ class StatusViewerLayoutWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      mainAxisSpacing: 8,
-      crossAxisSpacing: 8,
-      scrollDirection: Axis.vertical,
-      padding: const EdgeInsets.all(8.0),
-      clipBehavior: Clip.antiAliasWithSaveLayer,
+    return GridView.builder(
       key: PageStorageKey<String>(pageStorageKey),
+      padding: const EdgeInsets.all(8.0),
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
-      children: List<Widget>.generate(files.length, (int index) {
-        return WhatsAppItemCard(item: files[index]);
-      }),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 0.75,
+      ),
+
+      // 🔥 عدد العناصر + الإعلانات
+      itemCount: files.length + (files.length ~/ 4) + 1,
+
+      itemBuilder: (context, index) {
+        // 🔥 أول عنصر إعلان
+        if (index == 0) {
+          return const BannerAdWidget();
+        }
+
+        // 🔥 إعلان كل 4 عناصر
+        if (index % 4 == 0) {
+          return const BannerAdWidget();
+        }
+
+        final realIndex = index - (index ~/ 4) - 1;
+
+        // حماية من الأخطاء
+        if (realIndex < 0 || realIndex >= files.length) {
+          return const SizedBox();
+        }
+
+        final item = files[realIndex];
+
+        // 🔥 هنا Widget الحالة (عدّلها حسب مشروعك)
+        return WhatsAppItemCard(item: item);
+      },
+    );
+  }
+}
+
+// ⚠️ تأكد أن هذا Widget موجود عندك
+class WhatsAppItemCard extends StatelessWidget {
+  final dynamic item;
+
+  const WhatsAppItemCard({super.key, required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.grey[300],
+      ),
+      child: Center(
+        child: Text(
+          "Status",
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
     );
   }
 }
