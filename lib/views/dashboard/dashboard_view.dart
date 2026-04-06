@@ -5,10 +5,12 @@ import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extension
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
 import 'package:statusgetter/meta/settings/settings_meta.dart';
 import 'package:statusgetter/meta/themes/theme_meta.dart';
+import 'package:statusgetter/services/ads_service.dart'; // 🔥 الخدمة الجديدة
 import 'package:statusgetter/views/dashboard/cubit/dashboard_cubit.dart';
 import 'package:statusgetter/views/dashboard/layouts/business_wa/business_wa_layout_view.dart';
 import 'package:statusgetter/views/dashboard/layouts/tiktok_download/tiktok_download_layout_view.dart';
 import 'package:statusgetter/views/dashboard/layouts/whatsapp/whatsapp_layout_view.dart';
+import 'package:statusgetter/views/widgets/banner_ad_widget.dart'; // 🔥 الـ Widget الجديد
 import 'package:statusgetter/views/widgets/bottom_nav/bottom_nav_dashboard_widget.dart';
 import 'package:statusgetter/views/widgets/dialogs/exit_dialog_widget.dart';
 import 'package:statusgetter/views/widgets/drawer/drawer_dashboard_widget.dart';
@@ -60,8 +62,14 @@ class _DashboardViewState extends State<DashboardView> {
         showExitDialog(context);
         return false;
       },
-      bottomNavigationBar: DashboardBottomNav(
-        destinations: _pageViews.keys.toList(),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DashboardBottomNav(
+            destinations: _pageViews.keys.toList(),
+          ),
+          const AdBannerWidget(),
+        ],
       ),
       appBar: AppBar(
         centerTitle: false,
@@ -90,10 +98,14 @@ class _DashboardViewState extends State<DashboardView> {
             physics: const AlwaysScrollableScrollPhysics(),
             itemBuilder: (_, int i) => _pageViews.values.elementAt(i),
             onPageChanged: (int index) {
+              // 🔥 عرض إعلان بيني عند التنقل بين الصفحات
+              AdsService().showInterstitialAd();
               return cubit.updateBottomNavIndex(index, movePage: false);
             },
           ),
         ),
+        // 🔥 إضافة إعلان البانر أسفل الواجهة الرئيسية بشكل احترافي
+        
       ],
     );
   }

@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:statusgetter/core/ad_flow/ad_manager/ad_manager.dart';
-import 'package:statusgetter/core/ad_flow/widgets/banner_ad/banner_ad_widget.dart';
+import 'package:statusgetter/services/ads_service.dart';
+import 'package:statusgetter/views/widgets/banner_ad_widget.dart';
 import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extensions_core.dart';
 import 'package:statusgetter/core/extensions/object/object_extension_core.dart';
 import 'package:statusgetter/core/extensions/strings/string_extension_core.dart';
@@ -36,6 +36,7 @@ class _ImageStatusSaverViewState extends State<ImageStatusSaverView> {
       extendBody: true,
       useSafeArea: false,
       isScrollable: false,
+      bottomNavigationBar: const AdBannerWidget(),
       uiOverlay: AppThemes()
           .normalGB(context)
           .copyWith(statusBarColor: AppColors.noColor),
@@ -53,7 +54,7 @@ class _ImageStatusSaverViewState extends State<ImageStatusSaverView> {
                   case 0:
                     "download image".print();
                     ImageGallerySaver.saveFile(widget.path).then<void>((_) {
-                      AdManagerFunctions.instance.loadInterstitialAD();
+                      AdsService().showInterstitialAd();
                       "Status Saved".showSnackbar(context);
                     });
                     break;
@@ -82,7 +83,7 @@ class _ImageStatusSaverViewState extends State<ImageStatusSaverView> {
             ),
           ),
         ),
-        const BannerAdWidget(),
+       
       ],
     );
   }

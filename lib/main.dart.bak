@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart'; // 🔥 تمت الإضافة
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
@@ -16,10 +15,7 @@ import 'package:statusgetter/views/initial/initial_view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔥 تهيئة Google Mobile Ads (مهم جدًا)
-  await MobileAds.instance.initialize();
-
-  // 🔥 تهيئة نظام الإعلانات الاحترافي
+  // 🔥 تهيئة نظام الإعلانات الاحترافي (مستقل عن Firebase)
   await AdsService().init();
 
   HydratedBloc.storage = await HydratedStorage.build(
