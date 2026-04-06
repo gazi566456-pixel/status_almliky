@@ -16,10 +16,10 @@ import 'package:statusgetter/views/initial/initial_view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔥 ملاحظة مهندس: تم إزالة MobileAds.instance.initialize المباشر 
-  // لأن AdsService().init() تقوم بالتهيئة داخلياً بشكل أكثر تنظيماً.
-  
-  // تهيئة نظام الإعلانات الاحترافي
+  // 🔥 تهيئة الإعلانات (مهم جداً)
+  await MobileAds.instance.initialize();
+
+  // 🔥 تهيئة AdsService (إذا كنت تستخدمه)
   await AdsService().init();
 
   // تهيئة التخزين المؤقت للـ Bloc
@@ -35,15 +35,13 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  // تعيين تجاوزات HTTP (لحل مشاكل الشهادات في الإصدارات القديمة)
+  // تعيين تجاوزات HTTP
   HttpOverrides.global = MyHttpOverrides();
 
-  // تهيئة حقن التبعيات (Dependency Injection)
-  unawaited(initializeGetIt());
+  // تهيئة GetIt
+  await initializeGetIt();
 
-  // تهيئة Firebase
-  
-
+  // 🔥 تشغيل التطبيق
   runApp(const MyApp());
 }
 
