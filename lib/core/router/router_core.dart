@@ -1,45 +1,41 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:statusgetter/core/extensions/object/object_extension_core.dart';
-import 'package:statusgetter/core/router/router_name.dart';
-import 'package:statusgetter/core/router/router_page_animation.dart';
-import 'package:statusgetter/views/dashboard/dashboard_view.dart';
-import 'package:statusgetter/views/splash/splash_view.dart';
 
-@immutable
+// 👇 استبدلها بشاشتك الرئيسية الحقيقية
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Status Getter')),
+      body: const Center(
+        child: Text('App Started 🚀'),
+      ),
+    );
+  }
+}
+
 class RouterNavigator {
-  /// Instance for this class
-  static RouterNavigator? _instance;
+  late final GoRouter router;
 
-  /// Privatised the constructor
-  RouterNavigator._internal() {
-    "RouterNavigator constructor called".print();
-  }
+  RouterNavigator() {
+    router = GoRouter(
+      initialLocation: '/',
+      debugLogDiagnostics: true,
 
-  /// Provide a instance whenever it's needed
-  factory RouterNavigator() {
-    // Provide a instance if not initialized yet
-    _instance ??= RouterNavigator._internal();
-    return _instance!;
-  }
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => const HomeScreen(),
+        ),
+      ],
 
-  final GoRouter router = GoRouter(
-    debugLogDiagnostics: kDebugMode,
-    initialLocation: AppRoutes.splash,
-    routes: <GoRoute>[
-      GoRoute(
-        path: AppRoutes.splash,
-        builder: (_, GoRouterState state) => const SplashView(),
+      errorBuilder: (context, state) => Scaffold(
+        body: Center(
+          child: Text('Error: ${state.error}'),
+        ),
       ),
-      GoRoute(
-        path: AppRoutes.dashboard,
-        pageBuilder: (_, GoRouterState state) {
-          return FadePageAnimation(
-            state: state,
-            child: const DashboardView(),
-          );
-        },
-      ),
-    ],
-  );
+    );
+  }
 }
