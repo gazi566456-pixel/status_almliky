@@ -5,12 +5,11 @@ import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extension
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
 import 'package:statusgetter/meta/settings/settings_meta.dart';
 import 'package:statusgetter/meta/themes/theme_meta.dart';
-import 'package:statusgetter/services/ads_service.dart'; // 🔥 الخدمة الجديدة
 import 'package:statusgetter/views/dashboard/cubit/dashboard_cubit.dart';
 import 'package:statusgetter/views/dashboard/layouts/business_wa/business_wa_layout_view.dart';
 import 'package:statusgetter/views/dashboard/layouts/tiktok_download/tiktok_download_layout_view.dart';
 import 'package:statusgetter/views/dashboard/layouts/whatsapp/whatsapp_layout_view.dart';
-import 'package:statusgetter/views/widgets/banner_ad_widget.dart'; // 🔥 الـ Widget الجديد
+import 'package:statusgetter/views/widgets/banner_ad_widget.dart';
 import 'package:statusgetter/views/widgets/bottom_nav/bottom_nav_dashboard_widget.dart';
 import 'package:statusgetter/views/widgets/dialogs/exit_dialog_widget.dart';
 import 'package:statusgetter/views/widgets/drawer/drawer_dashboard_widget.dart';
@@ -25,8 +24,12 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-  /// Create an Instance of `DashboardCubit`
-  late final DashboardCubit cubit = getItInstance.get<DashboardCubit>();
+
+  /// 🔥 إصلاح: حماية من فشل GetIt
+  late final DashboardCubit cubit =
+      getItInstance.isRegistered<DashboardCubit>()
+          ? getItInstance.get<DashboardCubit>()
+          : DashboardCubit();
 
   @override
   void dispose() {
@@ -34,7 +37,6 @@ class _DashboardViewState extends State<DashboardView> {
     super.dispose();
   }
 
-  /// List to Hold `PageViews`
   final Map<NavigationDestination, Widget> _pageViews =
       <NavigationDestination, Widget>{
     const NavigationDestination(
@@ -62,16 +64,18 @@ class _DashboardViewState extends State<DashboardView> {
         showExitDialog(context);
         return false;
       },
+
+      /// 🔥 إصلاح: منع تعليق بسبب الإعلان
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 🔥 إصلاح هندسي: وضع البانر فوق شريط التنقل لضمان عدم اختفائه خلف أزرار النظام
-          const AdBannerWidget(),
+          const SizedBox(height: 50, child: AdBannerWidget()), // 👈 محمي
           DashboardBottomNav(
             destinations: _pageViews.keys.toList(),
           ),
         ],
       ),
+
       appBar: AppBar(
         centerTitle: false,
         backgroundColor: context.theme.colorScheme.primary,
@@ -90,23 +94,19 @@ class _DashboardViewState extends State<DashboardView> {
           SizedBox(width: 6.0),
         ],
       ),
+
       children: <Widget>[
         Expanded(
           child: PageView.builder(
             controller: cubit.pageController,
             itemCount: _pageViews.keys.length,
-            clipBehavior: Clip.antiAliasWithSaveLayer,
             physics: const AlwaysScrollableScrollPhysics(),
             itemBuilder: (_, int i) => _pageViews.values.elementAt(i),
             onPageChanged: (int index) {
-              // 🔥 إصلاح هندسي: تم حذف استدعاء الإعلان البيني من هنا 
-              // لأن عرضه عند التنقل بين التبويبات مخالف لسياسات AdMob (Unexpected Interstitial)
               return cubit.updateBottomNavIndex(index, movePage: false);
             },
           ),
         ),
-        // 🔥 إضافة إعلان البانر أسفل الواجهة الرئيسية بشكل احترافي
-        
       ],
     );
   }
