@@ -9,6 +9,50 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
 import 'package:statusgetter/core/functions/http_override/http_override_fun_core.dart';
+import 'package:statusgetter/services/ads_service.dart';
+import 'package:statusgetter/views/initial/initial_view.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 🔥 تهيئة الإعلانات
+  await MobileAds.instance.initialize();
+  await AdsService().init();
+
+  // 🔥 HydratedBloc
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory: kIsWeb
+        ? HydratedStorage.webStorageDirectory
+        : await getApplicationDocumentsDirectory(),
+  );
+
+  // 🔥 اتجاه الشاشة
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  // 🔥 HTTP
+  HttpOverrides.global = MyHttpOverrides();
+
+  // 🔥 GetIt
+  await initializeGetIt();
+
+  // ✅ التشغيل الصحيح
+  runApp(const InitialView());
+}
+
+/*import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
+import 'package:statusgetter/core/functions/http_override/http_override_fun_core.dart';
 
 import 'package:statusgetter/services/ads_service.dart';
 import 'package:statusgetter/views/initial/initial_view.dart';
@@ -42,15 +86,7 @@ void main() async {
   await initializeGetIt();
 
   // 🔥 تشغيل التطبيق
-  runApp(
-  const MaterialApp(
-    home: Scaffold(
-      body: Center(
-        child: Text("App Working ✅"),
-      ),
-    ),
-  ),
-);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -65,3 +101,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+*/
