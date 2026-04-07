@@ -78,38 +78,34 @@ class StatusViewerLayoutWidget extends StatelessWidget {
         childAspectRatio: 0.75,
       ),
 
-      // 🔥 عدد العناصر + الإعلانات
-      itemCount: files.length + (files.length ~/ 4) + 1,
+      // 🔥 عدد العناصر (مع الإعلانات بدون كسر)
+      itemCount: files.length + (files.length ~/ 4),
 
       itemBuilder: (context, index) {
 
-        // 🔥 أول عنصر إعلان
-        if (index == 0) {
+        // 🔥 عرض إعلان كل 4 عناصر (بدون أول عنصر)
+        if (index != 0 && index % 4 == 0) {
           return const BannerAdWidget();
         }
 
-        // 🔥 إعلان كل 4 عناصر
-        if (index % 4 == 0) {
-          return const BannerAdWidget();
-        }
+        // 🔥 حساب index الحقيقي بدون كسر القائمة
+        final realIndex = index - (index ~/ 4);
 
-        final realIndex = index - (index ~/ 4) - 1;
-
-        // حماية من الأخطاء
+        // حماية
         if (realIndex < 0 || realIndex >= files.length) {
           return const SizedBox();
         }
 
         final item = files[realIndex];
 
-        // 🔥 هنا Widget الحالة
+        // 🔥 عنصر الحالة (كما هو بدون حذف)
         return WhatsAppItemCard(item: item);
       },
     );
   }
 }
 
-// ⚠️ تأكد أن هذا Widget موجود عندك
+// ⚠️ هذا كما هو (لم يتم حذفه)
 class WhatsAppItemCard extends StatelessWidget {
   final dynamic item;
 
