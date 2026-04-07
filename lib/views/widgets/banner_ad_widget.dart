@@ -67,12 +67,14 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
   Widget build(BuildContext context) {
     // 🔥 إعطاء مساحة ثابتة للإعلان حتى لو لم يكتمل تحميله لمنع اهتزاز الـ UI
     return SafeArea(
-      child: SizedBox(
-        width: AdSize.banner.width.toDouble(),
-        height: AdSize.banner.height.toDouble(),
-        child: _isAdLoaded && _bannerAd != null
-            ? AdWidget(ad: _bannerAd!)
-            : const SizedBox.shrink(), // المساحة محجوزة بالفعل بفضل الـ SizedBox الأب
+      child: Center(
+        child: SizedBox(
+          width: AdSize.banner.width.toDouble(),
+          height: AdSize.banner.height.toDouble(),
+          child: _isAdLoaded && _bannerAd != null
+              ? AdWidget(ad: _bannerAd!)
+              : const SizedBox.shrink(),
+        ),
       ),
     );
   }
