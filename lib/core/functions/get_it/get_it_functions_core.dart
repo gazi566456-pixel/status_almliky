@@ -12,18 +12,45 @@ import 'package:statusgetter/views/initial/cubit/theme_cubit.dart';
 final GetIt getItInstance = GetIt.I;
 
 /// Initialize Instances using `GetIt`
-Future<void> initializeGetIt() {
-  // Initialize `Bloc and Cubit` Instances
-  getItInstance.registerLazySingleton<ThemeCubit>(() => ThemeCubit());
-  getItInstance.registerLazySingleton<AdServerCubit>(() => AdServerCubit());
-  getItInstance.registerLazySingleton<DashboardCubit>(() => DashboardCubit());
-  getItInstance.registerLazySingleton<AdManagerCubit>(() => AdManagerCubit());
-  getItInstance.registerLazySingleton<TiktokDownloadBloc>(
-    () => TiktokDownloadBloc(const SocialDownloadRepo()),
-  );
-  getItInstance.registerLazySingleton<WhatsappBloc>(() => WhatsappBloc());
-  getItInstance.registerLazySingleton<BusinessWhatsAppBloc>(
-    () => BusinessWhatsAppBloc(),
-  );
-  return Future<void>.value();
+Future<void> initializeGetIt() async {
+  // 🔥 منع التكرار (مهم جداً)
+  if (!getItInstance.isRegistered<ThemeCubit>()) {
+    getItInstance.registerLazySingleton<ThemeCubit>(() => ThemeCubit());
+  }
+
+  if (!getItInstance.isRegistered<AdServerCubit>()) {
+    getItInstance.registerLazySingleton<AdServerCubit>(
+      () => AdServerCubit(),
+    );
+  }
+
+  if (!getItInstance.isRegistered<DashboardCubit>()) {
+    getItInstance.registerLazySingleton<DashboardCubit>(
+      () => DashboardCubit(),
+    );
+  }
+
+  if (!getItInstance.isRegistered<AdManagerCubit>()) {
+    getItInstance.registerLazySingleton<AdManagerCubit>(
+      () => AdManagerCubit(),
+    );
+  }
+
+  if (!getItInstance.isRegistered<TiktokDownloadBloc>()) {
+    getItInstance.registerLazySingleton<TiktokDownloadBloc>(
+      () => TiktokDownloadBloc(const SocialDownloadRepo()),
+    );
+  }
+
+  if (!getItInstance.isRegistered<WhatsappBloc>()) {
+    getItInstance.registerLazySingleton<WhatsappBloc>(
+      () => WhatsappBloc(),
+    );
+  }
+
+  if (!getItInstance.isRegistered<BusinessWhatsAppBloc>()) {
+    getItInstance.registerLazySingleton<BusinessWhatsAppBloc>(
+      () => BusinessWhatsAppBloc(),
+    );
+  }
 }
