@@ -1,58 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:statusgetter/core/model/status_item/status_item_model.dart';
+import 'package:statusgetter/views/widgets/banner_ad_widget.dart';
+import 'package:statusgetter/views/dashboard/layouts/widgets/item_card/item_card_widget.dart';
 
-// 🔥 Widget الإعلان
-class BannerAdWidget extends StatefulWidget {
-  const BannerAdWidget({super.key});
-
-  @override
-  State<BannerAdWidget> createState() => _BannerAdWidgetState();
-}
-
-class _BannerAdWidgetState extends State<BannerAdWidget> {
-  BannerAd? _bannerAd;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _bannerAd = BannerAd(
-      size: AdSize.banner,
-      adUnitId: "ca-app-pub-3940256099942544/6300978111",
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          debugPrint("✅ Ad Loaded");
-        },
-        onAdFailedToLoad: (ad, error) {
-          debugPrint("❌ Ad Failed: $error");
-          ad.dispose();
-        },
-      ),
-      request: const AdRequest(),
-    );
-
-    _bannerAd!.load();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_bannerAd == null) return const SizedBox();
-
-    return Container(
-      alignment: Alignment.center,
-      height: 50,
-      child: AdWidget(ad: _bannerAd!),
-    );
-  }
-
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-    super.dispose();
-  }
-}
-
-// 🔥 Widget عرض الحالات
 class StatusViewerLayoutWidget extends StatelessWidget {
   final List files;
   final String pageStorageKey;
@@ -65,6 +15,10 @@ class StatusViewerLayoutWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🔥 إعلان كل 6 عناصر
+    const int adInterval = 6;
+    int totalCount = files.length + (files.length ~/ adInterval) + 1;
+
     return GridView.builder(
       key: PageStorageKey<String>(pageStorageKey),
       padding: const EdgeInsets.all(8.0),
@@ -75,60 +29,26 @@ class StatusViewerLayoutWidget extends StatelessWidget {
         crossAxisCount: 2,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
-        childAspectRatio: 0.75,
+        childAspectRatio: 0.85,
       ),
-
-      // 🔥 عدد العناصر (مع الإعلانات بدون كسر)
-      itemCount: files.length + (files.length ~/ 4) + 1,
-
+      itemCount: totalCount,
       itemBuilder: (context, index) {
-
-        // 🔥 أول عنصر إعلان (مهم جداً)
-        if (index == 0) {
-          return const BannerAdWidget();
+        // 🔥 إعلان في البداية وكل adInterval عناصر
+        if (index == 0 || (index > 0 && index % (adInterval + 1) == 0)) {
+          return const AdBannerWidget();
         }
 
-        // 🔥 إعلان كل 4 عناصر (بدون تكرار الأول)
-        if (index != 0 && index % 4 == 0) {
-          return const BannerAdWidget();
+        // 🔥 حساب index الحقيقي
+        int adCountBefore = (index ~/ (adInterval + 1)) + 1;
+        int realIndex = index - adCountBefore;
+
+        if (realIndex >= 0 && realIndex < files.length) {
+          final item = files[realIndex] as StatusItemModel;
+          return WhatsAppItemCard(item: item);
         }
 
-        // 🔥 حساب index الحقيقي بدون كسر القائمة
-        final realIndex = index - (index ~/ 4) - 1;
-
-        // حماية
-        if (realIndex < 0 || realIndex >= files.length) {
-          return const SizedBox();
-        }
-
-        final item = files[realIndex];
-
-        // 🔥 عنصر الحالة (كما هو بدون حذف)
-        return WhatsAppItemCard(item: item);
+        return const SizedBox.shrink();
       },
-    );
-  }
-}
-
-// ⚠️ هذا كما هو (لم يتم حذفه)
-class WhatsAppItemCard extends StatelessWidget {
-  final dynamic item;
-
-  const WhatsAppItemCard({super.key, required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.grey[300],
-      ),
-      child: const Center(
-        child: Text(
-          "Status",
-          style: TextStyle(color: Colors.black),
-        ),
-      ),
     );
   }
 }

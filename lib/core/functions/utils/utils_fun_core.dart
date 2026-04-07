@@ -78,32 +78,24 @@ class WaUtils {
 
   /// Provide the path for `WhatsApp Status` based on the app's permission to manage external storage.
   Future<String> get whatsAppPath async {
-    final String? path = await _waPathGeneratorUtil
-        .whatsAppPath(shouldAskManageExternalPermission);
-
-    // Return the obtained path if not empty; otherwise, fallback to default paths based on permission.
-    if (path.nullSafe.isNotEmpty) {
-      return path.nullSafe;
-    } else if (shouldAskManageExternalPermission) {
-      return "/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/.Statuses";
-    } else {
-      return "/storage/emulated/0/WhatsApp/Media/.Statuses";
+    if (shouldAskManageExternalPermission) {
+      // Android 11+ Path
+      final String modernPath = "/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/.Statuses";
+      if (await Directory(modernPath).exists()) return modernPath;
     }
+    // Legacy Path or Fallback
+    return "/storage/emulated/0/WhatsApp/Media/.Statuses";
   }
 
   /// Provide the path for `WhatsApp Business Status` based on the app's permission to manage external storage.
   Future<String> get whatsAppBusinessPath async {
-    final String? path = await _waPathGeneratorUtil
-        .businessWaPath(shouldAskManageExternalPermission);
-
-    // Return the obtained path if not empty; otherwise, fallback to default paths based on permission.
-    if (path.nullSafe.isNotEmpty) {
-      return path.nullSafe;
-    } else if (shouldAskManageExternalPermission) {
-      return "/storage/emulated/0/Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses";
-    } else {
-      return "/storage/emulated/0/WhatsApp Business/Media/.Statuses";
+    if (shouldAskManageExternalPermission) {
+      // Android 11+ Path
+      final String modernPath = "/storage/emulated/0/Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses";
+      if (await Directory(modernPath).exists()) return modernPath;
     }
+    // Legacy Path or Fallback
+    return "/storage/emulated/0/WhatsApp Business/Media/.Statuses";
   }
 
   /// Thumbnail Getter `MethodChannel` Name
