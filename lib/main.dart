@@ -42,7 +42,15 @@ void main() async {
   await initializeGetIt();
 
   // 🔥 تشغيل التطبيق
-  runApp(const MyApp());
+  runApp(
+  const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: Text("App Working ✅"),
+      ),
+    ),
+  ),
+);
 }
 
 class MyApp extends StatelessWidget {
