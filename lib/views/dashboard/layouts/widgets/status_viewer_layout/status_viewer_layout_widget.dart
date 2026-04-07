@@ -78,18 +78,23 @@ class StatusViewerLayoutWidget extends StatelessWidget {
         childAspectRatio: 0.75,
       ),
 
-      // 🔥 عدد العناصر (مع الإعلانات بدون كسر)
-      itemCount: files.length + (files.length ~/ 4),
+      // ✅ إصلاح العدد (لازم +1)
+      itemCount: files.length + (files.length ~/ 4) + 1,
 
       itemBuilder: (context, index) {
 
-        // 🔥 عرض إعلان كل 4 عناصر (بدون أول عنصر)
-        if (index != 0 && index % 4 == 0) {
+        // ✅ أول عنصر إعلان (مهم جداً)
+        if (index == 0) {
           return const BannerAdWidget();
         }
 
-        // 🔥 حساب index الحقيقي بدون كسر القائمة
-        final realIndex = index - (index ~/ 4);
+        // ✅ إعلان كل 4 عناصر
+        if (index % 4 == 0) {
+          return const BannerAdWidget();
+        }
+
+        // ✅ الحساب الصحيح (لازم -1)
+        final realIndex = index - (index ~/ 4) - 1;
 
         // حماية
         if (realIndex < 0 || realIndex >= files.length) {
