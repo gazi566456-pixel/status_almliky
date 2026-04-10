@@ -74,13 +74,10 @@ class _ExitHandlerState extends State<ExitHandler> {
     backPressCount = 1;
 
     /// 🔥 عرض الإعلان أولًا
-    AdsService().showInterstitialSmart();
+    
 
     /// 🔥 تأخير بسيط ثم عرض النافذة
-    Future.delayed(const Duration(milliseconds: 500), () {
-      showExitDialog(context);
-    });
-
+    
     return false;
   } else {
     backPressCount++;
