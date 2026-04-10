@@ -13,6 +13,88 @@ import 'package:statusgetter/core/functions/utils/utils_fun_core.dart';
 import 'package:statusgetter/services/ads_service.dart';
 import 'package:statusgetter/views/initial/initial_view.dart';
 
+/// 🔥 كلاس جديد للتحكم بزر الرجوع + الإعلان
+class ExitHandler extends StatefulWidget {
+  final Widget child;
+  const ExitHandler({super.key, required this.child});
+
+  @override
+  State<ExitHandler> createState() => _ExitHandlerState();
+}
+
+class _ExitHandlerState extends State<ExitHandler> {
+  int backPressCount = 0;
+  DateTime? lastBackPress;
+
+  void showExitDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("هل تريد الخروج؟"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              const Text("اضغط خروج للخروج من التطبيق"),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("إلغاء"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  exit(0);
+                });
+              },
+              child: const Text("خروج"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        final now = DateTime.now();
+
+        if (lastBackPress == null ||
+            now.difference(lastBackPress!) > const Duration(seconds: 2)) {
+
+          lastBackPress = now;
+          backPressCount = 1;
+
+          /// 🔥 عرض إعلان عند الرجوع
+          AdsService().showOnBack();
+
+          /// 🔥 عرض نافذة الخروج
+          showExitDialog(context);
+
+          return false;
+        } else {
+          backPressCount++;
+
+          if (backPressCount >= 2) {
+            return true;
+          }
+        }
+
+        return false;
+      },
+      child: widget.child,
+    );
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -44,67 +126,10 @@ void main() async {
   // 🔥 GetIt
   await initializeGetIt();
 
-  // ✅ التشغيل الصحيح
-  runApp(const InitialView());
-}
-
-/*import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
-import 'package:statusgetter/core/functions/http_override/http_override_fun_core.dart';
-
-import 'package:statusgetter/services/ads_service.dart';
-import 'package:statusgetter/views/initial/initial_view.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // 🔥 تهيئة الإعلانات (مهم جداً)
-  await MobileAds.instance.initialize();
-
-  // 🔥 تهيئة AdsService (إذا كنت تستخدمه)
-  await AdsService().init();
-
-  // تهيئة التخزين المؤقت للـ Bloc
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: kIsWeb
-        ? HydratedStorage.webStorageDirectory
-        : await getApplicationDocumentsDirectory(),
+  // ✅ التشغيل الصحيح مع إضافة ExitHandler بدون تخريب
+  runApp(
+    ExitHandler(
+      child: const InitialView(),
+    ),
   );
-
-  // تثبيت اتجاه الشاشة
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-
-  // تعيين تجاوزات HTTP
-  HttpOverrides.global = MyHttpOverrides();
-
-  // تهيئة GetIt
-  await initializeGetIt();
-
-  // 🔥 تشغيل التطبيق
-  runApp(const MyApp());
 }
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Status Saver',
-      home: InitialView(),
-    );
-  }
-}
-*/
