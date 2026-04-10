@@ -42,9 +42,9 @@ class StatusViewerLayoutWidget extends StatelessWidget {
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 0.85,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 0.8, // 🔥 تحسين الطول لضمان ظهور الأزرار بوضوح
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {

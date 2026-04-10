@@ -42,11 +42,16 @@ class WaUtils {
   /// In case of any exceptions, it catches a `PlatformException` and prints an error message.
   Future<void> getDeviceInfo() async {
     try {
-      _androidInfo ??= await _dInfo.androidInfo;
-      return;
+      _androidInfo = await _dInfo.androidInfo;
+      "Android SDK: ${_androidInfo?.version.sdkInt}".print("WaUtils");
     } on PlatformException catch (e) {
-      return e.message?.print("getDeviceInfo Error:");
+      e.message?.print("getDeviceInfo Error:");
     }
+  }
+
+  /// Initialize WaUtils
+  Future<void> init() async {
+    await getDeviceInfo();
   }
 
   /// Ask for Storage Permissions to Get Status from User Device.

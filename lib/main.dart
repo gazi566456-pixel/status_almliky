@@ -9,11 +9,17 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
 import 'package:statusgetter/core/functions/http_override/http_override_fun_core.dart';
+import 'package:statusgetter/core/functions/utils/utils_fun_core.dart';
 import 'package:statusgetter/services/ads_service.dart';
 import 'package:statusgetter/views/initial/initial_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 🔥 تهيئة المعلومات والأذونات قبل أي شيء آخر
+  final waUtils = WaUtils();
+  await waUtils.init();
+  await waUtils.askStoragePermission;
 
   // 🔥 تهيئة الإعلانات
   await MobileAds.instance.initialize();

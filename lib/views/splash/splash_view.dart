@@ -21,8 +21,19 @@ class SplashView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       initState: () {
         // Get Android Device Information
-        WaUtils().getDeviceInfo();
-        return WidgetsBinding.instance.addPostFrameCallback((_) {
+        final waUtils = WaUtils()..getDeviceInfo();
+        return WidgetsBinding.instance.addPostFrameCallback((_) async {
+          // طلب إذن الوصول للملفات عند بدء التشغيل
+          try {
+            if (waUtils.shouldAskManageExternalPermission) {
+              await Permission.manageExternalStorage.request();
+            } else {
+              await Permission.storage.request();
+            }
+          } catch (e) {
+            debugPrint("Permission Error: $e");
+          }
+
           // get Ads from Server
           AdManagerFunctions.instance.adServerCubit.fetchData();
           //You can enable or disable the log, this will help you track your download batches

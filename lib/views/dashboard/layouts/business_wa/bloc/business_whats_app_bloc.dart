@@ -37,7 +37,7 @@ class BusinessWhatsAppBloc extends Cubit<BusinessWhatsAppState> {
     /// Emit Loading State to indicate that the process has started.
     emitState(const BusinessWhatsAppState(isLoading: true));
 
-    // تحقق من حالة الإذن أولاً دون إعادة طلبه بشكل منبثق
+    // تحقق من حالة الإذن أولاً (تم طلبها في main.dart)
     PermissionStatus status;
     if (waUtils.shouldAskManageExternalPermission) {
       status = await Permission.manageExternalStorage.status;
@@ -45,10 +45,13 @@ class BusinessWhatsAppBloc extends Cubit<BusinessWhatsAppState> {
       status = await Permission.storage.status;
     }
 
-    /// Check permission status for accessing device storage.
-    /// If permission is denied, print a message and emit Permission Denied State.
-    if (status.isDenied || status.isPermanentlyDenied) {
-      "Storage denied or not granted yet".print("Permission");
+    /// إذا لم يكن الإذن ممنوحاً، اطلبه الآن
+    if (!status.isGranted) {
+      status = await waUtils.askStoragePermission;
+    }
+
+    if (!status.isGranted) {
+      "Storage permission not granted".print("Permission");
       return emitState(const BusinessWhatsAppState(permissionDenied: true));
     }
 

@@ -1,10 +1,14 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extensions_core.dart';
+import 'package:statusgetter/core/extensions/object/object_extension_core.dart';
 import 'package:statusgetter/core/extensions/strings/string_extension_core.dart';
 import 'package:statusgetter/core/model/status_item/status_item_model.dart';
 import 'package:statusgetter/meta/colors/colors_meta.dart';
+import 'package:statusgetter/services/ads_service.dart';
 import 'package:statusgetter/views/status_saver/image/image_status_saver_view.dart';
 import 'package:statusgetter/views/status_saver/video/video_status_saver_view.dart';
 
@@ -79,6 +83,50 @@ class WhatsAppItemCard extends StatelessWidget {
                       color: AppColors.kWhite,
                       item.isVideo ? Icons.play_circle_fill : Icons.image,
                     ),
+                  ),
+                ),
+                // 🔥 أزرار التحميل والمشاركة في الأسفل
+                Positioned(
+                  bottom: 5,
+                  left: 5,
+                  right: 5,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // زر التحميل
+                      GestureDetector(
+                        onTap: () {
+                          "Download Status".print();
+                          ImageGallerySaver.saveFile(item.filePath.nullSafe).then((_) {
+                            AdsService().showInterstitialAd();
+                            "Status Saved to Gallery".showSnackbar(context);
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.download, color: Colors.white, size: 18),
+                        ),
+                      ),
+                      // زر المشاركة
+                      GestureDetector(
+                        onTap: () {
+                          "Share Status".print();
+                          Share.shareXFiles([XFile(item.filePath.nullSafe)]);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.share, color: Colors.white, size: 18),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
