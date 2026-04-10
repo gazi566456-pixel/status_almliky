@@ -50,20 +50,23 @@ class _ImageStatusSaverViewState extends State<ImageStatusSaverView> {
               heroTag: "$index",
               clipBehavior: Clip.antiAliasWithSaveLayer,
               onPressed: () async {
-                switch (index) {
-                  case 0:
-                    "download image".print();
-                    ImageGallerySaver.saveFile(widget.path).await<void>((_) {
-                      AdsService().showInterstitialSmart();
-                      "Status Saved".showSnackbar(context);
-                    });
-                    break;
-                  case 1:
-                    "Share".print();
-                    Share.shareXFiles([XFile(widget.path)]);
-                    break;
-                }
-              },
+  switch (index) {
+    case 0:
+      "download image".print();
+
+      await ImageGallerySaver.saveFile(widget.path);
+
+      AdsService().showInterstitialSmart(context);
+
+      "Status Saved".showSnackbar(context);
+      break;
+
+    case 1:
+      "Share".print();
+      Share.shareXFiles([XFile(widget.path)]);
+      break;
+  }
+},
               child: floatingButtons.elementAt(index),
             );
           },

@@ -34,19 +34,20 @@ void _initApplovin() {
     return "none";
   }
 }
-void showInterstitialSmart() {
+void showInterstitialSmart(BuildContext context) {
   final network = _chooseBestNetwork();
 
   switch (network) {
     case "unity":
       _showUnityAd();
       break;
+
     case "applovin":
       _showApplovinAd();
       break;
+
     default:
-      // fallback للإعلان القديم (AdMob)
-      showInterstitialAd();
+      showInterstitialAd(); // 👈 لا يحتاج context
   }
 }
 void _showUnityAd() {
@@ -106,7 +107,8 @@ void onAdFailed(String network) {
   Future<void> init() async {
   // تهيئة Google Mobile Ads
   await MobileAds.instance.initialize();
-
+  
+await initNetworks();
   // 🔥 تحميل الإعلان البيني لأول مرة
   loadInterstitialAd();
 }

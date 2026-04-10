@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter/material.dart';
 
 class AdsService {
 // 🔥 شركات جديدة
@@ -34,19 +35,20 @@ void _initApplovin() {
     return "none";
   }
 }
-void showInterstitialSmart() {
+void showInterstitialSmart(BuildContext context) {
   final network = _chooseBestNetwork();
 
   switch (network) {
     case "unity":
       _showUnityAd();
       break;
+
     case "applovin":
       _showApplovinAd();
       break;
+
     default:
-      // fallback للإعلان القديم (AdMob)
-      showInterstitialAd();
+      showInterstitialAd(); // 👈 لا يحتاج context
   }
 }
 void _showUnityAd() {

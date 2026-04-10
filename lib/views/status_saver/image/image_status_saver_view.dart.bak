@@ -53,7 +53,7 @@ class _ImageStatusSaverViewState extends State<ImageStatusSaverView> {
                 switch (index) {
                   case 0:
                     "download image".print();
-                    ImageGallerySaver.saveFile(widget.path).then<void>((_) {
+                    ImageGallerySaver.saveFile(widget.path).await<void>((_) {
                       AdsService().showInterstitialSmart();
                       "Status Saved".showSnackbar(context);
                     });
