@@ -92,14 +92,7 @@ class AdsService {
   }
 
   /// Show Interstitial Ad
-  void showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-    } else {
-      debugPrint('AdsService: Interstitial Ad not ready, loading now...');
-      loadInterstitialAd();
-    }
-  }
+  
 
   /// Dispose Resources
   void dispose() {
@@ -119,5 +112,8 @@ class AdsService {
       },
     ),
   );
+}
+void showOnBack() {
+  showInterstitialAd();
 }
 }
