@@ -15,9 +15,6 @@ import 'package:statusgetter/views/widgets/dialogs/exit_dialog_widget.dart';
 import 'package:statusgetter/views/widgets/drawer/drawer_dashboard_widget.dart';
 import 'package:statusgetter/views/widgets/scaffold/scaffold_widgets.dart';
 import 'package:statusgetter/views/widgets/theme_switch/theme_switch_widget.dart';
-import 'dart:io';
-import 'package:statusgetter/services/ads_service.dart';
-
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -27,10 +24,6 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-
-int backPressCount = 0;
-DateTime? lastBackPress;
-
 
   /// 🔥 إصلاح: حماية من فشل GetIt
   late final DashboardCubit cubit =
@@ -68,29 +61,9 @@ DateTime? lastBackPress;
       drawer: const DashboardDrawer(),
       uiOverlay: AppThemes().primaryWithBG(context),
       onWillPop: () async {
-  print("BACK PRESSED 🔥");
-
-  final now = DateTime.now();
-
-  if (lastBackPress == null ||
-      now.difference(lastBackPress!) > const Duration(seconds: 2)) {
-
-    lastBackPress = now;
-    backPressCount = 1;
-
-    /// 🔥 إعلان
-    AdsService().showInterstitialSmart(context);
-
-    /// 🔥 نافذة بعد تأخير
-    Future.delayed(const Duration(milliseconds: 300), () {
-      showExitDialog(context);
-    });
-
-    return false;
-  } else {
-    return true; // خروج
-  }
-},
+        showExitDialog(context);
+        return false;
+      },
 
       /// 🔥 إصلاح: منع تعليق بسبب الإعلان
       bottomNavigationBar: Column(

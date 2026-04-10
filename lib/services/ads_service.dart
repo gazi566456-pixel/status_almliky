@@ -3,6 +3,71 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdsService {
+// 🔥 شركات جديدة
+bool unityReady = false;
+bool applovinReady = false;
+
+// 🔥 تقييم الأداء (تقدر تعدل لاحقًا)
+double unityScore = 0.9;
+double applovinScore = 0.8;
+Future<void> initNetworks() async {
+  _initUnity();
+  _initApplovin();
+}
+
+void _initUnity() {
+  // TODO: ربط Unity Ads هنا
+  unityReady = true;
+}
+
+void _initApplovin() {
+  // TODO: ربط AppLovin هنا
+  applovinReady = true;
+}String _chooseBestNetwork() {
+  if (unityReady && applovinReady) {
+    return unityScore >= applovinScore ? "unity" : "applovin";
+  } else if (unityReady) {
+    return "unity";
+  } else if (applovinReady) {
+    return "applovin";
+  } else {
+    return "none";
+  }
+}
+void showInterstitialSmart() {
+  final network = _chooseBestNetwork();
+
+  switch (network) {
+    case "unity":
+      _showUnityAd();
+      break;
+    case "applovin":
+      _showApplovinAd();
+      break;
+    default:
+      // fallback للإعلان القديم (AdMob)
+      showInterstitialAd();
+  }
+}
+void _showUnityAd() {
+  print("Unity Ad Showing");
+  // TODO: كود Unity الحقيقي
+}
+
+void _showApplovinAd() {
+  print("AppLovin Ad Showing");
+  // TODO: كود AppLovin الحقيقي
+}
+void onAdFailed(String network) {
+  if (network == "unity" && applovinReady) {
+    _showApplovinAd();
+  } else if (network == "applovin" && unityReady) {
+    _showUnityAd();
+  } else {
+    showInterstitialAd(); // يرجع للقديم
+  }
+}
+
   // Singleton pattern
   static final AdsService _instance = AdsService._internal();
   factory AdsService() => _instance;
@@ -41,7 +106,8 @@ class AdsService {
   Future<void> init() async {
   // تهيئة Google Mobile Ads
   await MobileAds.instance.initialize();
-
+  
+await initNetworks();
   // 🔥 تحميل الإعلان البيني لأول مرة
   loadInterstitialAd();
 }
@@ -116,4 +182,6 @@ class AdsService {
 void showOnBack() {
   showInterstitialAd();
 }
+
 }
+

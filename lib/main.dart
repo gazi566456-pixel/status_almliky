@@ -64,32 +64,34 @@ class _ExitHandlerState extends State<ExitHandler> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        final now = DateTime.now();
+    onWillPop: () async {
+  final now = DateTime.now();
 
-        if (lastBackPress == null ||
-            now.difference(lastBackPress!) > const Duration(seconds: 2)) {
+  if (lastBackPress == null ||
+      now.difference(lastBackPress!) > const Duration(seconds: 2)) {
 
-          lastBackPress = now;
-          backPressCount = 1;
+    lastBackPress = now;
+    backPressCount = 1;
 
-          /// 🔥 عرض إعلان عند الرجوع
-          AdsService().showOnBack();
+    /// 🔥 عرض الإعلان أولًا
+    AdsService().showInterstitialSmart();
 
-          /// 🔥 عرض نافذة الخروج
-          showExitDialog(context);
+    /// 🔥 تأخير بسيط ثم عرض النافذة
+    Future.delayed(const Duration(milliseconds: 500), () {
+      showExitDialog(context);
+    });
 
-          return false;
-        } else {
-          backPressCount++;
+    return false;
+  } else {
+    backPressCount++;
 
-          if (backPressCount >= 2) {
-            return true;
-          }
-        }
+    if (backPressCount >= 2) {
+      return true;
+    }
+  }
 
-        return false;
-      },
+  return false;
+} ,
       child: widget.child,
     );
   }
