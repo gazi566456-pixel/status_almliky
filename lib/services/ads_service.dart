@@ -35,7 +35,7 @@ void _initApplovin() {
     return "none";
   }
 }
-void showInterstitialSmart(BuildContext context) {
+Future<void> showInterstitialSmart(BuildContext context) async {
   final network = _chooseBestNetwork();
 
   switch (network) {
