@@ -4,12 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extensions_core.dart';
 import 'package:statusgetter/meta/colors/colors_meta.dart';
 import 'package:statusgetter/meta/settings/settings_meta.dart';
+import 'package:statusgetter/views/widgets/banner_ad_widget.dart';
 
 Future<void> showExitDialog(BuildContext context) {
   return showGeneralDialog<void>(
     context: context,
     barrierLabel: AppSettings.empty,
-    barrierColor: AppColors.kBlack.withOpacity(0.2),
+    barrierColor: AppColors.kBlack.withOpacity(0.5),
     pageBuilder: (_, __, ___) => const SizedBox.shrink(),
     transitionDuration: const Duration(milliseconds: 400),
     transitionBuilder: (_, Animation<double> a1, Animation<double> a2, __) {
@@ -30,55 +31,63 @@ class _ExitDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      elevation: 4.0,
+      elevation: 8.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       backgroundColor: context.bgColor,
       surfaceTintColor: context.bgColor,
-      insetPadding: EdgeInsets.symmetric(horizontal: (context.width * 0.06)),
+      insetPadding: EdgeInsets.symmetric(horizontal: (context.width * 0.08)),
       child: Container(
         width: context.width,
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             AutoSizeText(
-              'Exit App',
+              'تأكيد الخروج',
               maxLines: 1,
-              style: context.textTheme.titleLarge,
+              style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16.0),
             AutoSizeText(
               maxLines: 3,
+              textAlign: TextAlign.center,
               style: context.textTheme.bodyMedium,
-              'Are you sure you want to exit the app?',
+              'هل أنت متأكد أنك تريد الخروج من التطبيق؟',
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 20.0),
+            
+            // 🔥 إضافة الإعلان هنا
+            const SizedBox(
+              height: 60,
+              child: AdBannerWidget(),
+            ),
+            
+            const SizedBox(height: 24.0),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                const Spacer(),
-                TextButton(
-                  child: const AutoSizeText('Cancel', maxLines: 1),
-                  onPressed: () => context.popNavigator(),
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: const AutoSizeText('إلغاء', maxLines: 1),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
                 const SizedBox(width: 12.0),
-                ElevatedButton(
-                  onPressed: () => SystemNavigator.pop(),
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      context.theme.colorScheme.primary,
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => SystemNavigator.pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: context.theme.colorScheme.primary,
+                      foregroundColor: AppColors.kWhite,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    surfaceTintColor: WidgetStatePropertyAll(
-                      context.theme.colorScheme.primary,
-                    ),
-                    foregroundColor: const WidgetStatePropertyAll(
-                      AppColors.kWhite,
-                    ),
-                    iconColor: const WidgetStatePropertyAll(
-                      AppColors.kWhite,
-                    ),
+                    child: const AutoSizeText('تأكيد الخروج', maxLines: 1),
                   ),
-                  child: const AutoSizeText('Exit', maxLines: 1),
                 ),
               ],
             ),

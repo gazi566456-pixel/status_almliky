@@ -13,87 +13,6 @@ import 'package:statusgetter/core/functions/utils/utils_fun_core.dart';
 import 'package:statusgetter/services/ads_service.dart';
 import 'package:statusgetter/views/initial/initial_view.dart';
 
-/// 🔥 كلاس جديد للتحكم بزر الرجوع + الإعلان
-class ExitHandler extends StatefulWidget {
-  final Widget child;
-  const ExitHandler({super.key, required this.child});
-
-  @override
-  State<ExitHandler> createState() => _ExitHandlerState();
-}
-
-class _ExitHandlerState extends State<ExitHandler> {
-  int backPressCount = 0;
-  DateTime? lastBackPress;
-
-  void showExitDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("هل تريد الخروج؟"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 10),
-              const Text("اضغط خروج للخروج من التطبيق"),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("إلغاء"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Future.delayed(const Duration(milliseconds: 200), () {
-                  exit(0);
-                });
-              },
-              child: const Text("خروج"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-    onWillPop: () async {
-  final now = DateTime.now();
-
-  if (lastBackPress == null ||
-      now.difference(lastBackPress!) > const Duration(seconds: 2)) {
-
-    lastBackPress = now;
-    backPressCount = 1;
-
-    /// 🔥 عرض الإعلان أولًا
-    
-
-    /// 🔥 تأخير بسيط ثم عرض النافذة
-    
-    return false;
-  } else {
-    backPressCount++;
-
-    if (backPressCount >= 2) {
-      return true;
-    }
-  }
-
-  return false;
-} ,
-      child: widget.child,
-    );
-  }
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -125,10 +44,8 @@ void main() async {
   // 🔥 GetIt
   await initializeGetIt();
 
-  // ✅ التشغيل الصحيح مع إضافة ExitHandler بدون تخريب
+  // ✅ التشغيل الصحيح بتمرير InitialView مباشرة
   runApp(
-    ExitHandler(
-      child: const InitialView(),
-    ),
+    const InitialView(),
   );
 }

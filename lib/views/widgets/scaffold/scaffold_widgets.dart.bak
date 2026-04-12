@@ -100,20 +100,17 @@ class _CustomScaffoldState extends State<CustomScaffold> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: widget.uiOverlay ?? AppThemes().normalGB(context),
       child: PopScope(
-        canPop: widget.canPop, // 🔥 يتم تمرير false من DashboardView لمنع الخروج المباشر
-        onPopInvoked: (bool didPop) async {
-          // إذا تم الخروج بالفعل (didPop == true)، لا نفعل شيئاً
+        canPop: widget.canPop, // 🔥 استخدام القيمة الممررة (false في DashboardView)
+        onPopInvoked: (didPop) async {
           if (didPop) return;
           
-          // إذا كان هناك منطق مخصص لزر الرجوع
           if (widget.onWillPop != null) {
-            final bool shouldPop = await widget.onWillPop!();
+            final shouldPop = await widget.onWillPop!();
             if (shouldPop && mounted) {
-              // إذا كان مسموحاً بالخروج، نتحقق من الـ Navigator
+              // إذا كان هناك Navigator، قم بالرجوع العادي، وإلا اخرج من التطبيق
               if (Navigator.canPop(context)) {
                 Navigator.pop(context);
               } else {
-                // إذا كنا في الصفحة الرئيسية، نغلق التطبيق
                 SystemNavigator.pop();
               }
             }

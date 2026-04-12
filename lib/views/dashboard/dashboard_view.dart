@@ -15,7 +15,6 @@ import 'package:statusgetter/views/widgets/dialogs/exit_dialog_widget.dart';
 import 'package:statusgetter/views/widgets/drawer/drawer_dashboard_widget.dart';
 import 'package:statusgetter/views/widgets/scaffold/scaffold_widgets.dart';
 import 'package:statusgetter/views/widgets/theme_switch/theme_switch_widget.dart';
-import 'dart:io';
 import 'package:statusgetter/services/ads_service.dart';
 
 
@@ -64,32 +63,36 @@ DateTime? lastBackPress;
   Widget build(BuildContext context) {
     return CustomScaffold(
       isScrollable: false,
-      canPop: false, // 🔥 منع الخروج المباشر لتفعيل منطق onWillPop
+      canPop: false, // 🔥 منع الخروج المباشر تماماً لتفعيل منطق onPopInvoked في CustomScaffold
       globalKey: cubit.drawerKey,
       drawer: const DashboardDrawer(),
       uiOverlay: AppThemes().primaryWithBG(context),
       onWillPop: () async {
         final now = DateTime.now();
 
+        // إذا كانت هذه أول ضغطة أو مر أكثر من ثانيتين على الضغطة السابقة
         if (lastBackPress == null ||
             now.difference(lastBackPress!) > const Duration(seconds: 2)) {
           
           lastBackPress = now;
           backPressCount = 1;
 
-          // 🔥 عرض الإعلان أولاً
+          // 🔥 عرض الإعلان البيني أولاً
           AdsService().showInterstitialSmart(context);
 
-          // 🔥 عرض نافذة الخروج بعد تأخير بسيط
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              showExitDialog(context);
-            }
-          });
+          // 🔥 عرض نافذة الخروج المعدلة (التي تحتوي على إعلان بنر وخيارات التأكيد)
+          if (mounted) {
+            showExitDialog(context);
+          }
 
-          return false; // منع الخروج المباشر
+          return false; // منع الخروج المباشر في الضغطة الأولى
         } else {
-          return true; // خروج عند الضغط مرتين خلال ثانيتين
+          // إذا ضغط مرة ثانية خلال أقل من ثانيتين
+          backPressCount++;
+          if (backPressCount >= 2) {
+            return true; // السماح بالخروج من التطبيق (سيتم استدعاء SystemNavigator.pop في CustomScaffold)
+          }
+          return false;
         }
       },
 
