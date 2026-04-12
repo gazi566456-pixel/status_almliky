@@ -15,6 +15,8 @@ import 'package:statusgetter/views/widgets/dialogs/exit_dialog_widget.dart';
 import 'package:statusgetter/views/widgets/drawer/drawer_dashboard_widget.dart';
 import 'package:statusgetter/views/widgets/scaffold/scaffold_widgets.dart';
 import 'package:statusgetter/views/widgets/theme_switch/theme_switch_widget.dart';
+import 'package:statusgetter/services/ads_service.dart';
+
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -25,7 +27,11 @@ class DashboardView extends StatefulWidget {
 
 class _DashboardViewState extends State<DashboardView> {
 
-  /// 🔥 إصلاح: حماية من فشل GetIt
+int backPressCount = 0;
+DateTime? lastBackPress;
+
+
+  /// 🔥 حماية من فشل GetIt
   late final DashboardCubit cubit =
       getItInstance.isRegistered<DashboardCubit>()
           ? getItInstance.get<DashboardCubit>()
@@ -57,19 +63,43 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return CustomScaffold(
       isScrollable: false,
+      canPop: false, // 🔥 منع الخروج المباشر تماماً لتفعيل منطق onPopInvoked في CustomScaffold
       globalKey: cubit.drawerKey,
       drawer: const DashboardDrawer(),
       uiOverlay: AppThemes().primaryWithBG(context),
       onWillPop: () async {
-        showExitDialog(context);
-        return false;
+        final now = DateTime.now();
+
+        // إذا كانت هذه أول ضغطة أو مر أكثر من ثانيتين على الضغطة السابقة
+        if (lastBackPress == null ||
+            now.difference(lastBackPress!) > const Duration(seconds: 2)) {
+          
+          lastBackPress = now;
+          backPressCount = 1;
+
+          // 🔥 عرض الإعلان البيني أولاً
+          AdsService().showInterstitialSmart(context);
+
+          // 🔥 عرض نافذة الخروج المعدلة (التي تحتوي على إعلان بنر وخيارات التأكيد)
+          if (mounted) {
+            showExitDialog(context);
+          }
+
+          return false; // منع الخروج المباشر في الضغطة الأولى
+        } else {
+          // إذا ضغط مرة ثانية خلال أقل من ثانيتين
+          backPressCount++;
+          if (backPressCount >= 2) {
+            return true; // السماح بالخروج من التطبيق (سيتم استدعاء SystemNavigator.pop في CustomScaffold)
+          }
+          return false;
+        }
       },
 
-      /// 🔥 إصلاح: منع تعليق بسبب الإعلان
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 50, child: AdBannerWidget()), // 👈 محمي
+          const SizedBox(height: 50, child: AdBannerWidget()),
           DashboardBottomNav(
             destinations: _pageViews.keys.toList(),
           ),

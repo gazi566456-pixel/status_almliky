@@ -67,34 +67,39 @@ DateTime? lastBackPress;
       globalKey: cubit.drawerKey,
       drawer: const DashboardDrawer(),
       uiOverlay: AppThemes().primaryWithBG(context),
-      onWillPop: () async {
-        final now = DateTime.now();
+  onWillPop: () async {
+  final now = DateTime.now();
 
-        // إذا كانت هذه أول ضغطة أو مر أكثر من ثانيتين على الضغطة السابقة
-        if (lastBackPress == null ||
-            now.difference(lastBackPress!) > const Duration(seconds: 2)) {
-          
-          lastBackPress = now;
-          backPressCount = 1;
+  if (lastBackPress == null ||
+      now.difference(lastBackPress!) > const Duration(seconds: 2)) {
 
-          // 🔥 عرض الإعلان البيني أولاً
-          AdsService().showInterstitialSmart(context);
+    lastBackPress = now;
+    backPressCount = 1;
 
-          // 🔥 عرض نافذة الخروج المعدلة (التي تحتوي على إعلان بنر وخيارات التأكيد)
-          if (mounted) {
-            showExitDialog(context);
-          }
+    // 🔥 انتظر الإعلان
+    await AdsService().showInterstitialSmart(context);
 
-          return false; // منع الخروج المباشر في الضغطة الأولى
-        } else {
-          // إذا ضغط مرة ثانية خلال أقل من ثانيتين
-          backPressCount++;
-          if (backPressCount >= 2) {
-            return true; // السماح بالخروج من التطبيق (سيتم استدعاء SystemNavigator.pop في CustomScaffold)
-          }
-          return false;
-        }
-      },
+    // 🔥 انتظر الديالوج
+    if (mounted) {
+      final result = await showExitDialog(context);
+      return result ?? false; // لا خروج إلا إذا وافق المستخدم
+    }
+
+    return false;
+  } else {
+    backPressCount++;
+
+    if (backPressCount >= 2) {
+      // 🔥 حتى هنا لازم تنتظر الديالوج
+      if (mounted) {
+        final result = await showExitDialog(context);
+        return result ?? false;
+      }
+    }
+
+    return false;
+  }
+},
 
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,

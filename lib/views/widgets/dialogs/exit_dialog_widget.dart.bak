@@ -6,8 +6,8 @@ import 'package:statusgetter/meta/colors/colors_meta.dart';
 import 'package:statusgetter/meta/settings/settings_meta.dart';
 import 'package:statusgetter/views/widgets/banner_ad_widget.dart';
 
-Future<bool?> showExitDialog(BuildContext context) {
-  return showGeneralDialog<bool>(
+Future<void> showExitDialog(BuildContext context) {
+  return showGeneralDialog<void>(
     context: context,
     barrierLabel: AppSettings.empty,
     barrierColor: AppColors.kBlack.withOpacity(0.5),
@@ -46,8 +46,7 @@ class _ExitDialog extends StatelessWidget {
             AutoSizeText(
               'تأكيد الخروج',
               maxLines: 1,
-              style: context.textTheme.titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16.0),
             AutoSizeText(
@@ -57,13 +56,13 @@ class _ExitDialog extends StatelessWidget {
               'هل أنت متأكد أنك تريد الخروج من التطبيق؟',
             ),
             const SizedBox(height: 20.0),
-
+            
             // 🔥 إضافة الإعلان هنا
             const SizedBox(
               height: 60,
               child: AdBannerWidget(),
             ),
-
+            
             const SizedBox(height: 24.0),
             Row(
               children: <Widget>[
@@ -71,29 +70,21 @@ class _ExitDialog extends StatelessWidget {
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const AutoSizeText('إلغاء', maxLines: 1),
-                    onPressed: () {
-                      Navigator.pop(context, false); // ❌ إلغاء
-                    },
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ),
                 const SizedBox(width: 12.0),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context, true); // ✅ تأكيد الخروج
-                    },
+                    onPressed: () => SystemNavigator.pop(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: context.theme.colorScheme.primary,
                       foregroundColor: AppColors.kWhite,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const AutoSizeText('تأكيد الخروج', maxLines: 1),
                   ),
