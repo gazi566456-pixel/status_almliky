@@ -59,7 +59,7 @@ class _DashboardViewState extends State<DashboardView> {
     return CustomScaffold(
       isScrollable: false,
       canPop: false, // 🔥 منع الخروج المباشر لتفعيل منطق onPopInvoked في CustomScaffold
-      globalKey: cubit.drawerKey,
+      globalKey: cubit.drawerKey, // 🔥 ربط المفتاح العالمي للتحكم في الـ Drawer
       drawer: const DashboardDrawer(),
       uiOverlay: AppThemes().primaryWithBG(context),
       onWillPop: () async {
@@ -88,7 +88,8 @@ class _DashboardViewState extends State<DashboardView> {
         title: const AutoSizeText(AppSettings.appName, maxLines: 1),
         leading: IconButton(
           onPressed: () {
-            return cubit.drawerKey.currentState?.openDrawer();
+            // 🔥 فتح القائمة الجانبية باستخدام المفتاح العالمي المرتبط بالـ Scaffold
+            cubit.drawerKey.currentState?.openDrawer();
           },
           icon: const Icon(Icons.menu_outlined),
           color: context.appBar.iconTheme?.color,
