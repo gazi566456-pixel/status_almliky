@@ -6,11 +6,14 @@ import 'package:statusgetter/core/model/status_item/status_item_model.dart';
 extension FileSystemEntityExtensionModule on FileSystemEntity {
   /// Getter to check if the file is a video file.
   /// This checks if the file path ends with ".mp4".
-  bool get isVideo => path.endsWith(".mp4");
+  bool get isVideo => path.toLowerCase().endsWith(".mp4");
 
   /// Getter to check if the file is a picture file.
-  /// This checks if the file path ends with ".jpg".
-  bool get isPicture => path.endsWith(".jpg");
+  /// This checks if the file path ends with ".jpg" or ".jpeg" or ".png".
+  bool get isPicture => 
+      path.toLowerCase().endsWith(".jpg") || 
+      path.toLowerCase().endsWith(".jpeg") || 
+      path.toLowerCase().endsWith(".png");
 }
 
 /// Extension module on Iterable<FileSystemEntity> to generate a list of StatusItemModel

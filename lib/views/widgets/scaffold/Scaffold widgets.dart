@@ -100,19 +100,14 @@ class _CustomScaffoldState extends State<CustomScaffold> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: widget.uiOverlay ?? AppThemes().normalGB(context),
       child: PopScope(
-        canPop: widget.canPop, // 🔥 استخدام القيمة الممررة (true افتراضياً)
+        canPop: false, // 🔥 منع الخروج التلقائي لتفعيل onPopInvoked
         onPopInvoked: (didPop) async {
           if (didPop) return;
           
           if (widget.onWillPop != null) {
             final shouldPop = await widget.onWillPop!();
             if (shouldPop && mounted) {
-              // إذا كان هناك Navigator، قم بالرجوع العادي، وإلا اخرج من التطبيق
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
-                SystemNavigator.pop();
-              }
+              SystemNavigator.pop();
             }
           } else if (widget.onPopInvoked != null) {
             widget.onPopInvoked!(didPop);

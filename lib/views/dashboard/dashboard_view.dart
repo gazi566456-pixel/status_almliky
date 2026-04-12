@@ -32,7 +32,7 @@ int backPressCount = 0;
 DateTime? lastBackPress;
 
 
-  /// 🔥 إصلاح: حماية من فشل GetIt
+  /// 🔥 حماية من فشل GetIt
   late final DashboardCubit cubit =
       getItInstance.isRegistered<DashboardCubit>()
           ? getItInstance.get<DashboardCubit>()
@@ -64,39 +64,39 @@ DateTime? lastBackPress;
   Widget build(BuildContext context) {
     return CustomScaffold(
       isScrollable: false,
+      canPop: false, // 🔥 منع الخروج المباشر لتفعيل منطق onWillPop
       globalKey: cubit.drawerKey,
       drawer: const DashboardDrawer(),
       uiOverlay: AppThemes().primaryWithBG(context),
       onWillPop: () async {
-  print("BACK PRESSED 🔥");
+        final now = DateTime.now();
 
-  final now = DateTime.now();
+        if (lastBackPress == null ||
+            now.difference(lastBackPress!) > const Duration(seconds: 2)) {
+          
+          lastBackPress = now;
+          backPressCount = 1;
 
-  if (lastBackPress == null ||
-      now.difference(lastBackPress!) > const Duration(seconds: 2)) {
+          // 🔥 عرض الإعلان أولاً
+          AdsService().showInterstitialSmart(context);
 
-    lastBackPress = now;
-    backPressCount = 1;
+          // 🔥 عرض نافذة الخروج بعد تأخير بسيط
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              showExitDialog(context);
+            }
+          });
 
-    /// 🔥 إعلان
-    AdsService().showInterstitialSmart(context);
+          return false; // منع الخروج المباشر
+        } else {
+          return true; // خروج عند الضغط مرتين خلال ثانيتين
+        }
+      },
 
-    /// 🔥 نافذة بعد تأخير
-    Future.delayed(const Duration(milliseconds: 300), () {
-      showExitDialog(context);
-    });
-
-    return false;
-  } else {
-    return true; // خروج
-  }
-},
-
-      /// 🔥 إصلاح: منع تعليق بسبب الإعلان
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 50, child: AdBannerWidget()), // 👈 محمي
+          const SizedBox(height: 50, child: AdBannerWidget()),
           DashboardBottomNav(
             destinations: _pageViews.keys.toList(),
           ),

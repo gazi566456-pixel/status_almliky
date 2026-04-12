@@ -23,38 +23,67 @@ class VideoStatusSaverView extends StatefulWidget {
 }
 
 class _VideoStatusSaverViewState extends State<VideoStatusSaverView> {
-  /// Create an Instance of `Size`
-  late final Size size = context.sizeApi;
+  late VideoPlayerController _videoPlayerController;
+  ChewieController? _chewieController;
+  bool _isInitialized = false;
 
-  /// Create a List of Floating Action Buttons
+  @override
+  void initState() {
+    super.initState();
+    _initializePlayer();
+  }
+
+  Future<void> _initializePlayer() async {
+    _videoPlayerController = VideoPlayerController.file(File(widget.path));
+    
+    try {
+      await _videoPlayerController.initialize();
+      _chewieController = ChewieController(
+        videoPlayerController: _videoPlayerController,
+        autoPlay: true,
+        looping: true,
+        aspectRatio: _videoPlayerController.value.aspectRatio,
+        errorBuilder: (context, errorMessage) {
+          return Center(
+            child: Text(
+              errorMessage,
+              style: const TextStyle(color: Colors.white),
+            ),
+          );
+        },
+      );
+      setState(() {
+        _isInitialized = true;
+      });
+    } catch (e) {
+      "Video Init Error: $e".print();
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    _chewieController?.dispose();
+    super.dispose();
+  }
+
   final List<Widget> floatingButtons = const <Widget>[
     Icon(Icons.download),
     Icon(Icons.share),
   ];
 
-  /// Create an Instance of `ChewieController`
-  late final ChewieController _chewieController = ChewieController(
-    looping: true,
-    autoPlay: true,
-    aspectRatio: (5 / 6),
-    errorBuilder: (_, String error) {
-      return Center(child: Text(error));
-    },
-    videoPlayerController: VideoPlayerController.file(File(widget.path)),
-  );
-
-  @override
-  void dispose() {
-    _chewieController.pause();
-    _chewieController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
       isScrollable: false,
-      bottomNavigationBar: const AdBannerWidget(),
+      canPop: true, // 🔥 السماح بالرجوع
+      onWillPop: () async {
+        return true; // 🔥 السماح بالرجوع عند الضغط على زر الخلف
+      },
+      bottomNavigationBar: const SizedBox(
+        height: 60,
+        child: AdBannerWidget(),
+      ),
       uiOverlay: AppThemes().normalGB(context).copyWith(
             statusBarColor: AppColors.noColor,
           ),
@@ -66,12 +95,12 @@ class _VideoStatusSaverViewState extends State<VideoStatusSaverView> {
             return Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
               child: FloatingActionButton(
-                heroTag: "$index",
+                heroTag: "video_fab_$index",
                 clipBehavior: Clip.antiAliasWithSaveLayer,
                 onPressed: () async {
                   switch (index) {
                     case 0:
-                      "download image".print();
+                      "download video".print();
                       ImageGallerySaver.saveFile(widget.path).then<void>((_) {
                         AdsService().showInterstitialAd();
                         "Status Saved".showSnackbar(context);
@@ -90,8 +119,16 @@ class _VideoStatusSaverViewState extends State<VideoStatusSaverView> {
         ),
       ),
       children: <Widget>[
-        Expanded(child: Chewie(controller: _chewieController)),
-        
+        Expanded(
+          child: Container(
+            color: Colors.black,
+            child: _isInitialized && _chewieController != null
+                ? Chewie(controller: _chewieController!)
+                : const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+          ),
+        ),
       ],
     );
   }
