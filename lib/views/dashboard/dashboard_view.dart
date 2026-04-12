@@ -15,7 +15,6 @@ import 'package:statusgetter/views/widgets/dialogs/exit_dialog_widget.dart';
 import 'package:statusgetter/views/widgets/drawer/drawer_dashboard_widget.dart';
 import 'package:statusgetter/views/widgets/scaffold/scaffold_widgets.dart';
 import 'package:statusgetter/views/widgets/theme_switch/theme_switch_widget.dart';
-import 'package:statusgetter/services/ads_service.dart';
 
 
 class DashboardView extends StatefulWidget {
@@ -26,10 +25,6 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-
-int backPressCount = 0;
-DateTime? lastBackPress;
-
 
   /// 🔥 حماية من فشل GetIt
   late final DashboardCubit cubit =
@@ -63,43 +58,17 @@ DateTime? lastBackPress;
   Widget build(BuildContext context) {
     return CustomScaffold(
       isScrollable: false,
-      canPop: false, // 🔥 منع الخروج المباشر تماماً لتفعيل منطق onPopInvoked في CustomScaffold
+      canPop: false, // 🔥 منع الخروج المباشر لتفعيل منطق onPopInvoked في CustomScaffold
       globalKey: cubit.drawerKey,
       drawer: const DashboardDrawer(),
       uiOverlay: AppThemes().primaryWithBG(context),
-  onWillPop: () async {
-  final now = DateTime.now();
-
-  if (lastBackPress == null ||
-      now.difference(lastBackPress!) > const Duration(seconds: 2)) {
-
-    lastBackPress = now;
-    backPressCount = 1;
-
-    // 🔥 انتظر الإعلان
-    await AdsService().showInterstitialSmart(context);
-
-    // 🔥 انتظر الديالوج
-    if (mounted) {
-      final result = await showExitDialog(context);
-      return result ?? false; // لا خروج إلا إذا وافق المستخدم
-    }
-
-    return false;
-  } else {
-    backPressCount++;
-
-    if (backPressCount >= 2) {
-      // 🔥 حتى هنا لازم تنتظر الديالوج
-      if (mounted) {
-        final result = await showExitDialog(context);
-        return result ?? false;
-      }
-    }
-
-    return false;
-  }
-},
+      onWillPop: () async {
+        // 🔥 استدعاء نافذة تأكيد الخروج عند محاولة الرجوع
+        if (mounted) {
+          showExitDialog(context);
+        }
+        return false; // منع الخروج التلقائي
+      },
 
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
